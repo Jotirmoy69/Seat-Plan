@@ -8,24 +8,27 @@ import { PiExportBold } from "react-icons/pi";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTrash } from "react-icons/fa";
 import toast, { Toaster } from "react-hot-toast";
-import { a, form } from "framer-motion/client";
+import { a, div, form, h2 } from "framer-motion/client";
 import { HiPencil } from "react-icons/hi2";
 
 export default function Home() {
   const [nav, setNav] = useState(0);
   const [isOpened, setIsOpened] = useState(false);
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false);
   const [room, setRoom] = useState([]);
   const [boys, setBoys] = useState([]);
   const [girls, setGirls] = useState([]);
   const [forms, setForms] = useState([]);
-const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
+  const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0);
+  const [isLogined, setIsLogined] = useState(false);
   // input
   const [roomNumber, setRoomNumber] = useState(0);
   const [roomCapacity, setRoomCapacity] = useState(0);
   const [formName, setFormName] = useState("");
   const [formClass, setFormClass] = useState(0);
   const [roll, setRoll] = useState(0);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("")
 
   useEffect(() => {
     const fetchRoom = async () => {
@@ -187,13 +190,7 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      if (
-        roll === 0 ||
-        roll === null ||
-        roll === undefined ||
-        roll === NaN ||
-        roll === ""
-      ) {
+      if (roll === 0 || roll === "") {
         toast.error("Please enter roll number");
         return;
       }
@@ -213,7 +210,9 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
       }
 
       const existsInForms = forms.some((item) => item.boys.includes(roll));
-      if (existsInForms) {
+      const existsInForms2 = forms.some((item) => item.girls.includes(roll));
+
+      if (existsInForms || existsInForms2) {
         toast.error("Roll already exists in this class");
         return;
       }
@@ -253,9 +252,9 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
         }
       }
 
-
       const existsInForms = forms.some((item) => item.girls.includes(roll));
-      if (existsInForms) {
+      const existsInForms2 = forms.some((item) => item.boys.includes(roll));
+      if (existsInForms || existsInForms2) {
         toast.error("Roll already exists in this class");
         return;
       }
@@ -313,14 +312,17 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
       }
 
       // reset after success
-      setForms((prev) => [...prev,{
-        name: formName,
-        class: formClass,
-        boys: boys,
-        girls: girls,
-        totalBoys: totalBoys,
-        totalGirls: totalGirls,
-      }]);
+      setForms((prev) => [
+        ...prev,
+        {
+          name: formName,
+          class: formClass,
+          boys: boys,
+          girls: girls,
+          totalBoys: totalBoys,
+          totalGirls: totalGirls,
+        },
+      ]);
       setFormName("");
       setFormClass(0);
       setBoys([]);
@@ -376,73 +378,99 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
   };
 
   const handleCloseEditingDiv = async () => {
-  if (boys.length < 5) {
-    toast.error("You have to add at least 5 boys");
-    return;
-  }
-  if (girls.length < 5) {
-    toast.error("You have to add at least 5 girls");
-    return;
-  }
-
-  const editIndex = currentFormEditingIndex;
-  const id = forms[editIndex]._id;
-  const name = forms[editIndex].name;
-  const class0 = forms[editIndex].class;
-
-  const editPromise = fetch("/api/updateform", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      _id: id,
-      name:name,
-      class: class0,
-      boys:boys,
-      girls:girls,
-      totalBoys: boys.length,
-      totalGirls: girls.length,
-    }),
-  }).then(async (res) => {
-    const data = await res.json();
-    if (!res.ok || data.status !== 200) {
-      throw new Error(data.message || "Failed to edit form");
+    if (boys.length < 5) {
+      toast.error("You have to add at least 5 boys");
+      return;
+    }
+    if (girls.length < 5) {
+      toast.error("You have to add at least 5 girls");
+      return;
     }
 
-    // Update state after success
-    setForms((prev) =>
-      prev.map((form, i) =>
-        i === editIndex
-          ? {
-              ...form,
-              name,
-              class: class0,
-              boys,
-              girls,
-              totalBoys: boys.length,
-              totalGirls: girls.length,
-            }
-          : form
-      )
-    );
+    const editIndex = currentFormEditingIndex;
+    const id = forms[editIndex]._id;
+    const name = forms[editIndex].name;
+    const class0 = forms[editIndex].class;
 
-    setFormName("");
-    setFormClass(0);
-    setBoys([]);
-    setGirls([]);
-    setIsEditing(false);
+    const editPromise = fetch("/api/updateform", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        _id: id,
+        name: name,
+        class: class0,
+        boys: boys,
+        girls: girls,
+        totalBoys: boys.length,
+        totalGirls: girls.length,
+      }),
+    }).then(async (res) => {
+      const data = await res.json();
+      if (!res.ok || data.status !== 200) {
+        throw new Error(data.message || "Failed to edit form");
+      }
 
-    return "Form edited successfully";
-  });
+      // Update state after success
+      setForms((prev) =>
+        prev.map((form, i) =>
+          i === editIndex
+            ? {
+                ...form,
+                name,
+                class: class0,
+                boys,
+                girls,
+                totalBoys: boys.length,
+                totalGirls: girls.length,
+              }
+            : form
+        )
+      );
 
-  toast.promise(editPromise, {
-    loading: "Editing form...",
-    success: (msg) => msg,
-    error: (err) => err.message || "Server error",
-  });
+      setFormName("");
+      setFormClass(0);
+      setBoys([]);
+      setGirls([]);
+      setIsEditing(false);
 
-  await editPromise; // optional if you want to wait for completion
-};
+      return "Form edited successfully";
+    });
 
+    toast.promise(editPromise, {
+      loading: "Editing form...",
+      success: (msg) => msg,
+      error: (err) => err.message || "Server error",
+    });
+
+    await editPromise; // optional if you want to wait for completion
+  };
+
+  const handleLogin = async () =>{ 
+    let res = fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username:username,
+        password: password,
+      }),
+    }).then(async (res) => {
+      const data = await res.json();
+      if (!res.ok || data.status !== 200) {
+        throw new Error(data.message || "Failed to add form");
+      }
+      setIsLogined(true);
+      console.log(data);
+      
+      return "Login successful"; // ✅ success message
+    });
+    toast.promise(res, {
+      loading: "Logging in...",
+      success: (msg) => msg,
+      error: (err) => err.message || "Server error",
+    });
+  }
 
 
   return (
@@ -541,6 +569,42 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
           >
             <div className="w-full h-[60vh] ml-5 bg-[#242020] p-10  rounded-[15px] ">
               <h1 className="font-[GB] text-3xl">Dashboard</h1>
+              <div className="w-full h-full  pb-6 pt-5">
+                <div className="flex h-full gap-5">
+                  <div className="w-1/2 h-full bg-[#C8FF00] py-3 px-5  rounded-[15px]">
+                    <h1 className="font-[GB] text-2xl  text-[#000]">
+                      All Forms
+                    </h1>
+                    <div className="w-full h-[1px] bg-[#000] my-1"></div>
+                    <div className="w-full  h-full flex flex-wrap">
+                      {forms.map((form, index) => (
+                        <h2
+                          key={index}
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          {form.name},
+                        </h2>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="w-1/2 h-full bg-[#C8FF00] py-3 px-5  rounded-[15px]">
+                    <h1 className="font-[GB] text-2xl  text-[#000]">
+                      All Rooms
+                    </h1>
+                    <div className="w-full h-[1px] bg-[#000] my-1"></div>
+                    <div className="w-full  h-full flex flex-wrap">
+                      {room.map((room, index) => (
+                        <h2
+                          key={index}
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          {room.number},
+                        </h2>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="flex w-full h-full ml-5 gap-5">
               <div className="w-1/2 h-full  bg-[#242020] p-10  rounded-[15px] "></div>
@@ -593,7 +657,7 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
               <h1 className="font-[GB] text-3xl">Add Forms</h1>
               {/* lower div  */}
 
-              <div className="w-full py-3 transition-all duration-500  gap-2 flex">
+              <div className="w-full py-3 transition-all duration-500  gap-2 flex-wrap flex">
                 <AnimatePresence>
                   {forms.map((form, index) => (
                     <motion.div
@@ -610,7 +674,9 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
                       className="group overflow-hidden flex px-5 cursor-pointer flex-col hover:delay-300 items-start hover:shadow-2xl bg-[#C8FF00] hover:h-44 transition-all duration-300 h-12 text-gray-950   py-2 rounded-md w-48 justify-between gap-5"
                     >
                       <div className="flex w-full items-center justify-between">
-                        <h1 className="font-[GB] text-2xl capitalize">{form.name} </h1>
+                        <h1 className="font-[GB] text-2xl capitalize">
+                          {form.name}{" "}
+                        </h1>
                         <FaTrash
                           onClick={() => handleFormDelete(index)}
                           className="hover:cursor-pointer scale-125 h-3  w-3 "
@@ -630,7 +696,11 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
                         <h2 className="font-[GB] group-hover:opacity-100 delay-300 group-hover:delay-0 opacity-0 text-xl">
                           Class - {form.class}
                         </h2>
-                        <HiPencil onClick={() =>handleRollEditBox(index)} size={18} className="group-hover:opacity-100 delay-300 transition-all duration-1000 ease-in-out hover:rotate-360 cursor-pointer group-hover:delay-0 opacity-0 ml-4" />
+                        <HiPencil
+                          onClick={() => handleRollEditBox(index)}
+                          size={18}
+                          className="group-hover:opacity-100 delay-300 transition-all duration-1000 ease-in-out hover:rotate-360 cursor-pointer group-hover:delay-0 opacity-0 ml-4"
+                        />
                       </div>
                     </motion.div>
                   ))}
@@ -682,7 +752,7 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
             <div className="w-full ml-5 h-full  bg-[#242020] p-10 flex flex-col  rounded-[15px] ">
               <h1 className="font-[GB] text-3xl">Add Rooms</h1>
               {/* lower div  */}
-              <div className="w-full py-3 transition-all duration-500  gap-5 flex">
+              <div className="w-full py-3 transition-all duration-500  gap-2 flex-warp flex">
                 <AnimatePresence>
                   {room.map((room, index) => (
                     <motion.div
@@ -721,7 +791,7 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
         <div className="w-full h-full fixed flex top-0 justify-between left-0 backdrop-blur-sm bg-black/50 ">
           <div className="w-1/3 b-amber-100  h-full flex flex-col gap-3 px-3 py-2 ">
             <h1 className="font-[GB] text-3xl text-[#FFFFFF]">Boys</h1>
-            <div className="w-full h-[90vh] grid-flow-col grid grid-cols-4 grid-col grid-rows-12  gap-4  ">
+            <div className="w-full h-[90vh] flex flex-col justify-start items-start flex-wrap gap-2  ">
               {boys.map((roll, index) => (
                 <div
                   key={index}
@@ -740,7 +810,7 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
             <h1 className="font-[GB] text-end text-3xl text-[#FFFFFF]">
               Girls
             </h1>
-            <div className="w-full h-[95vh]  py-3 grid grid-cols-4 grid-flow-col justify-end grid-rows-12 gap-3  ">
+            <div className="w-full h-[95vh]  py-3 flex flex-col justify-start items-start flex-wrap-reverse gap-2  ">
               {girls.map((roll, index) => (
                 <div
                   key={index}
@@ -790,9 +860,9 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
 
       {isEditing && (
         <div className="w-full h-full fixed flex top-0 justify-between left-0 backdrop-blur-sm bg-black/50 ">
-          <div className="w-1/3 b-amber-100  h-full flex flex-col gap-3 px-3 py-2 ">
+          <div className="w-1/6 b-amber-100  h-full flex flex-col gap-3 px-3 py-2 ">
             <h1 className="font-[GB] text-3xl text-[#FFFFFF]">Boys</h1>
-            <div className="w-full h-[90vh] grid-flow-col grid grid-cols-4 grid-col grid-rows-12  gap-4  ">
+            <div className="w-full h-[90vh] flex flex-col justify-start items-start flex-wrap  gap-2  ">
               {boys.map((roll, index) => (
                 <div
                   key={index}
@@ -807,11 +877,11 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
               ))}
             </div>
           </div>
-          <div className="w-1/3  h-full px-3 flex flex-col gap-3 py-2">
+          <div className="w-1/6  h-full px-3 flex flex-col  py-2">
             <h1 className="font-[GB] text-end text-3xl text-[#FFFFFF]">
               Girls
             </h1>
-            <div className="w-full h-[95vh]  py-3 grid grid-cols-4 grid-flow-col justify-end grid-rows-12 gap-3  ">
+            <div className="w-full h-[95vh]  py-3 flex flex-col justify-start items-start flex-wrap-reverse  gap-2  ">
               {girls.map((roll, index) => (
                 <div
                   key={index}
@@ -857,6 +927,81 @@ const [currentFormEditingIndex, setCurrentFormEditingIndex] = useState(0)
             </div>
           </motion.div>
         </div>
+      )}
+
+      {!isLogined && (
+        <section className=" fixed top-0 left-0 right-0 bottom-0 bg-[#1B1717]">
+          <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+            <div className="w-full  rounded-lg shadow  md:mt-0 sm:max-w-md xl:p-0 bg-[#242020] dark:border-gray-700">
+              <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+                <h1 className="text-xl font-bold leading-tight tracking-tight  md:text-2xl text-white">
+                  Sign in to your account
+                </h1>
+                <div className="space-y-4 md:space-y-6" action="#">
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Your Username
+                    </label>
+                    <input
+                      name="Room Number"
+                      className="w-full h-12 rounded-lg focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-[color,box-shadow] outline-none bg-[#282828] text-white ring-[#7d7d7d] px-5"
+                      placeholder="wizard.spell_"
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="password"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Password
+                    </label>
+                    <input
+                      name="password"
+                      className="w-full h-12 rounded-lg focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-[color,box-shadow] outline-none bg-[#282828] text-white ring-[#7d7d7d] px-5"
+                      placeholder="••••••••" 
+                      type="text"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-start">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="remember"
+                          aria-describedby="remember"
+                          type="checkbox"
+                          className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
+                          
+                        />
+                      </div>
+                      <div className="ml-3 text-sm">
+                        <label
+                          htmlFor="remember"
+                          className="text-gray-500 dark:text-gray-300"
+                        >
+                          Remember me
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleLogin}
+                    className="w-full cursor-pointer hover:bg-lime-400 transition-all duration-400 font-[GB] text-md  bg-[#C8FF00] text-[#000] hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg  px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  >
+                    Sign in
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       )}
       <Toaster position="top-right" />
     </>
