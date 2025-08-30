@@ -1,0 +1,42 @@
+@import "tailwindcss"; 
+
+@font-face {
+  font-family: "GEB";
+  src: url("../public/fonts/Gilroy-ExtraBold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "GB";
+  src: url("../public/fonts/Gilroy-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "GM";
+  src: url("../public/fonts/Gilroy-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "GR";
+  src: url("../public/fonts/Gilroy-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "GSB";
+  src: url("../public/fonts/Gilroy-SemiBold.ttf") format("truetype");
+}
+body {
+  background-color: #1b1717;
+  /* color: aliceblue; */
+}
+
+/* Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
