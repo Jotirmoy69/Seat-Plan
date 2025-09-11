@@ -28,7 +28,7 @@ export default function Home() {
   const [formClass, setFormClass] = useState(0);
   const [roll, setRoll] = useState(0);
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("")
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     const fetchRoom = async () => {
@@ -445,14 +445,14 @@ export default function Home() {
     await editPromise; // optional if you want to wait for completion
   };
 
-  const handleLogin = async () =>{ 
+  const handleLogin = async () => {
     let res = fetch("/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username:username,
+        username: username,
         password: password,
       }),
     }).then(async (res) => {
@@ -462,7 +462,7 @@ export default function Home() {
       }
       setIsLogined(true);
       console.log(data);
-      
+
       return "Login successful"; // ✅ success message
     });
     toast.promise(res, {
@@ -470,15 +470,14 @@ export default function Home() {
       success: (msg) => msg,
       error: (err) => err.message || "Server error",
     });
-  }
-
+  };
 
   return (
     <>
       <div className="py-4 px-4 h-screen flex text-white relative">
         {/* Sidebar */}
         <div className="bg-[#242020] h-full rounded-[15px] w-1/5 py-10 relative">
-          <h1 className="px-16 font-[GEB] text-4xl">Seat Plan</h1>
+          <h1 className="text-center font-[GEB] text-3xl">Seat Plan</h1>
           <div className="py-20 px-14 flex flex-col justify-between h-full relative">
             <div className="relative flex flex-col space-y-5">
               {/* Dashboard */}
@@ -496,8 +495,8 @@ export default function Home() {
                 <div
                   className={`flex items-center gap-2 p-3 ${
                     nav === 0
-                      ? "text-gray-950 font-[GB] text-xl z-9"
-                      : "font-[GB] text-xl text-white"
+                      ? "text-gray-950 font-[GB] text-lg z-9"
+                      : "font-[GB] text-lg text-white"
                   }`}
                 >
                   <MdOutlineSpaceDashboard size={25} /> Dashboard
@@ -519,8 +518,8 @@ export default function Home() {
                 <div
                   className={`flex items-center gap-2 p-3 ${
                     nav === 1
-                      ? "text-gray-950 font-[GB] text-xl z-9"
-                      : "font-[GB] text-xl text-white"
+                      ? "text-gray-950 font-[GB] text-lg z-9"
+                      : "font-[GB] text-lg text-white"
                   }`}
                 >
                   <IoAdd size={25} /> Add Form
@@ -542,8 +541,8 @@ export default function Home() {
                 <div
                   className={`flex items-center gap-2 p-3 ${
                     nav === 2
-                      ? "text-gray-950 font-[GB] text-xl z-1"
-                      : "font-[GB] text-xl text-white"
+                      ? "text-gray-950 font-[GB] text-lg z-1"
+                      : "font-[GB] text-lg text-white"
                   }`}
                 >
                   <IoAdd size={25} /> Add Room
@@ -567,7 +566,7 @@ export default function Home() {
             animate={{ opacity: 1, x: -0 }}
             className="w-4/5 pr-4 gap-5 flex flex-col"
           >
-            <div className="w-full h-[60vh] ml-5 bg-[#242020] p-10  rounded-[15px] ">
+            <div className="w-full max-h-[40vh]  ml-5 bg-[#242020] p-10  rounded-[15px] ">
               <h1 className="font-[GB] text-3xl">Dashboard</h1>
               <div className="w-full h-full  pb-6 pt-5">
                 <div className="flex h-full gap-5">
@@ -576,7 +575,7 @@ export default function Home() {
                       All Forms
                     </h1>
                     <div className="w-full h-[1px] bg-[#000] my-1"></div>
-                    <div className="w-full  h-full flex flex-wrap">
+                    <div className="w-full flex hide-scrollbar flex-wrap h-30 overflow-y-scroll gap-2">
                       {forms.map((form, index) => (
                         <h2
                           key={index}
@@ -584,23 +583,121 @@ export default function Home() {
                         >
                           {form.name},
                         </h2>
-                      ))}
+                      ))}  
+                      
                     </div>
                   </div>
                   <div className="w-1/2 h-full bg-[#C8FF00] py-3 px-5  rounded-[15px]">
                     <h1 className="font-[GB] text-2xl  text-[#000]">
                       All Rooms
                     </h1>
-                    <div className="w-full h-[1px] bg-[#000] my-1"></div>
-                    <div className="w-full  h-full flex flex-wrap">
-                      {room.map((room, index) => (
+                    <div className="w-full h-[1px] bg-[#000] my-1"></div> 
+                    <div className="w-full flex hide-scrollbar   h-30 items-start justify-start overflow-scroll gap-2">
+                      {/* {room.map((room, index) => (
                         <h2
                           key={index}
                           className="font-[GB] text-md text-[#000] capitalize"
                         >
                           {room.number},
                         </h2>
-                      ))}
+                      ))}   */}
+
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      <h2
+                          className="font-[GB] text-md text-[#000] capitalize"
+                        >
+                          111,
+                        </h2>
+                      
                     </div>
                   </div>
                 </div>
@@ -964,7 +1061,7 @@ export default function Home() {
                     <input
                       name="password"
                       className="w-full h-12 rounded-lg focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-[color,box-shadow] outline-none bg-[#282828] text-white ring-[#7d7d7d] px-5"
-                      placeholder="••••••••" 
+                      placeholder="••••••••"
                       type="text"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -978,7 +1075,6 @@ export default function Home() {
                           aria-describedby="remember"
                           type="checkbox"
                           className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-                          
                         />
                       </div>
                       <div className="ml-3 text-sm">

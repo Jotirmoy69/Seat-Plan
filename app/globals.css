@@ -40,3 +40,13 @@ input[type=number]::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+.hide-scrollbar {
+  overflow: auto;               /* scrolling enabled */
+  -ms-overflow-style: none;     /* IE + Edge */
+  scrollbar-width: none;        /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;                /* Chrome, Safari, Opera */
+}
